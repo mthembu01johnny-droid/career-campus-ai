@@ -1,45 +1,69 @@
-# Career Campus AI
+# Career Campus AI - AI-Powered Career Guidance Platform
 
-AI-powered career guidance and campus recruitment platform for students, mentors, and institutions.
+An innovative platform connecting ambitious students with personalized career guidance, mentorship, and opportunities.
 
 ## Features
 
-- Supabase authentication
-- PostgreSQL schema for student profiles and career recommendations
-- Landing page and responsive marketing experience
-- Student onboarding workflow
-- Personalized dashboard view
-- App Router architecture with Next.js
-- Jest + Testing Library setup
-- Deployment guidance for Vercel + Supabase
+✨ **Core Features**
+- 🤖 AI-powered career recommendations based on student profiles
+- 👤 Comprehensive student profiles with skills and interests tracking
+- 📊 Interactive dashboard with career fit scores and milestones
+- 🎯 Personalized learning pathways and goal tracking
+- 🤝 Mentor connection matching system
+- 💼 Job and internship opportunity discovery
+- 🏢 Recruiter and company partnership platform
+- 🛡️ Secure authentication with Supabase
+- 📱 Mobile-responsive design
+- ⚡ Production-ready infrastructure
 
-## Project structure
+## Tech Stack
 
-- `app/` - App Router pages and API routes
-- `components/` - Shared UI components
-- `lib/supabase/` - Supabase client helpers
-- `database/schema.sql` - PostgreSQL schema
-- `scripts/migrate.js` - Migration helper
-- `__tests__/` - Test coverage
+**Frontend**
+- Next.js 14+ (App Router)
+- React 18+
+- TypeScript
+- Tailwind CSS
+- SWR (data fetching)
 
-## Prerequisites
+**Backend**
+- Next.js API routes
+- Supabase (PostgreSQL + Auth)
+- Row-level security policies
+- Real-time subscriptions ready
 
+**DevOps & Deployment**
+- Vercel (primary)
+- Docker support
+- GitHub Actions ready
+- Environment-based configuration
+
+## Quick Start
+
+### Prerequisites
 - Node.js 18+
 - npm or pnpm
-- A Supabase project
-- Optional: Vercel account for deployment
+- Supabase account (free at supabase.com)
+- Git
 
-## Environment setup
+### Local Development Setup
 
-1. Copy `.env.example` to `.env.local`
-2. Add your Supabase project values:
+**1. Clone and install**
+```bash
+git clone https://github.com/mthembu01johnny-droid/career-campus-ai.git
+cd career-campus-ai
+npm install
+```
 
+**2. Create Supabase project**
+- Go to [supabase.com](https://supabase.com) → New Project
+- Copy Project URL and anon key from Settings > API
+
+**3. Configure environment**
 ```bash
 cp .env.example .env.local
 ```
 
-Then update the values:
-
+Edit `.env.local`:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
@@ -47,48 +71,208 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-## Local development
+**4. Set up database**
+- In Supabase SQL Editor → New Query
+- Paste `supabase/migrations/202609280001_initial.sql`
+- Click "Run"
 
+**5. Configure auth redirect**
+- Supabase → Authentication > URL Configuration
+- Add Redirect URL: `http://localhost:3000/auth/callback`
+- Set Site URL: `http://localhost:3000`
+
+**6. Start development server**
 ```bash
-npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open http://localhost:3000
 
-## Database setup
+## Project Structure
 
-Apply the SQL in `database/schema.sql` in your Supabase SQL editor.
-
-```bash
-npm run db:migrate
+```
+career-campus-ai/
+├── app/
+│   ├── page.tsx                 # Landing page
+│   ├── login/                   # Auth flows
+│   ├── signup/
+│   ├── onboarding/              # Student onboarding
+│   ├── profile/                 # Profile editing
+│   ├── dashboard/               # Student dashboard
+│   ├── recruiter/               # Company onboarding
+│   ├── admin/                   # Admin dashboard
+│   ├── auth/callback/           # OAuth callback
+│   ├── api/                     # API routes (future)
+│   ├── layout.tsx               # Root layout
+│   └── globals.css              # Global styles
+├── components/
+│   └── auth/                    # Auth components
+│       ├── SignInForm.tsx
+│       ├── SignUpForm.tsx
+│       └── SignOutButton.tsx
+├── lib/
+│   ├── supabase/
+│   │   ├── auth.ts              # Auth functions
+│   │   ├── database.ts          # DB functions
+│   │   └── client.ts            # Client helper
+│   └── recommendation-engine.ts # Career recommendations
+├── supabase/
+│   └── migrations/              # Database migrations
+├── __tests__/                   # Test files
+├── .env.example                 # Env template
+├── middleware.ts                # Auth middleware
+├── vercel.json                  # Vercel config
+├── tailwind.config.ts           # Tailwind config
+└── README.md
 ```
 
-## Testing
+## Key Pages
+
+| Page | Path | Purpose |
+|------|------|----------|
+| Landing | `/` | Public landing page |
+| Sign Up | `/signup` | Create account |
+| Sign In | `/login` | Login to account |
+| Onboarding | `/onboarding` | Complete student profile |
+| Dashboard | `/dashboard` | View recommendations & progress |
+| Profile | `/profile` | Edit student profile |
+| Recruiter | `/recruiter/onboarding` | Company registration |
+| Admin | `/admin` | Admin statistics |
+
+## Authentication Flow
+
+1. User signs up with email/password
+2. Supabase creates auth session
+3. User redirected to `/onboarding` to complete profile
+4. Profile data stored in PostgreSQL
+5. Career recommendations generated
+6. User views dashboard with personalized insights
+
+## Database Schema
+
+**students**
+- id (UUID, PK)
+- email (text, unique)
+- full_name (text)
+- major (text)
+- interests (text[])
+- career_goals (text)
+- onboarding_complete (boolean)
+- created_at, updated_at (timestamps)
+
+**student_progress**
+- id (UUID, PK)
+- student_id (UUID, FK)
+- milestone (text)
+- status (enum)
+- due_date (date)
+- notes (text)
+- created_at (timestamp)
+
+**career_recommendations**
+- id (UUID, PK)
+- student_id (UUID, FK)
+- role_name (text)
+- fit_score (numeric)
+- reason (text)
+- created_at (timestamp)
+
+## Career Recommendation Algorithm
+
+The recommendation engine:
+1. Extracts skills from student's major, interests, and goals
+2. Matches against a database of career roles
+3. Calculates fit scores based on:
+   - Skill alignment (70%)
+   - Interest alignment (30%)
+4. Returns top 5 matching careers
+
+Extendable for:
+- Machine learning models
+- External job board APIs
+- Labor market data integration
+
+## Available Scripts
 
 ```bash
-npm test
+npm run dev              # Start dev server
+npm run build            # Build for production
+npm run start            # Start production server
+npm run lint             # Run ESLint
+npm run type-check       # TypeScript checking
+npm test                 # Run tests
 ```
 
 ## Deployment
 
-### Option 1: Vercel + Supabase
+### Vercel (Recommended)
 
-1. Push the repository to GitHub.
-2. Import the project into Vercel.
-3. Add the same environment variables from `.env.local`.
-4. Deploy the app.
-5. Add your Supabase redirect URL, such as:
-   - `https://your-app.vercel.app/auth/callback`
-   - `http://localhost:3000/auth/callback`
+1. Push to GitHub
+2. Import repo in Vercel dashboard
+3. Add environment variables from `.env.example`
+4. Deploy
+5. Update Supabase auth redirect URL to your Vercel domain
 
-### Option 2: Self-hosted Node environment
+### Docker
 
 ```bash
-npm run build
-npm run start
+docker build -t career-campus-ai .
+docker run -p 3000:3000 \
+  -e NEXT_PUBLIC_SUPABASE_URL=<url> \
+  -e NEXT_PUBLIC_SUPABASE_ANON_KEY=<key> \
+  career-campus-ai
 ```
 
-## Notes
+## Security
 
-This project is intentionally structured for easy extension into a production student career platform with additional mentor modules, AI recommendation APIs, and campus placement features.
+- ✅ Row-level security (RLS) on all tables
+- ✅ JWT-based authentication
+- ✅ CORS configured
+- ✅ Environment variables protected
+- ✅ Middleware guards protected routes
+- ✅ No sensitive data in cookies
+
+## Testing
+
+```bash
+npm test                 # Run all tests
+npm run test:watch       # Watch mode
+npm run test:coverage    # Coverage report
+```
+
+## Contributing
+
+1. Create a feature branch: `git checkout -b feature/amazing-feature`
+2. Commit changes: `git commit -m 'Add amazing feature'`
+3. Push to branch: `git push origin feature/amazing-feature`
+4. Open a Pull Request
+
+## Roadmap
+
+- [ ] Real-time mentor matching
+- [ ] AI-powered interview prep
+- [ ] Internship marketplace integration
+- [ ] Skill verification badges
+- [ ] Mobile app (React Native)
+- [ ] Advanced analytics
+- [ ] Community features
+- [ ] Video mentorship
+
+## Support
+
+- 📖 [Next.js Docs](https://nextjs.org/docs)
+- 📚 [Supabase Docs](https://supabase.com/docs)
+- 🎨 [Tailwind Docs](https://tailwindcss.com/docs)
+- 💬 Open an issue on GitHub
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Authors
+
+- **mthembu01johnny-droid** - Initial development
+
+---
+
+**Built with ❤️ for ambitious students**

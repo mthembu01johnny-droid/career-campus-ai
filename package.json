@@ -1,20 +1,20 @@
 {
   "name": "career-campus-ai",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest --runInBand",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "db:migrate": "node scripts/migrate.js",
-    "type-check": "tsc --noEmit"
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.8.7",
+    "@supabase/auth-helpers-react": "^0.4.5",
     "@supabase/supabase-js": "^2.45.0",
     "next": "14.2.15",
     "react": "18.3.1",
