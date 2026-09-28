@@ -1,62 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { getCurrentUser } from '@/lib/supabase/auth';
+import { upsertStudentProfile } from '@/lib/supabase/database';
+import SignOutButton from '@/components/auth/SignOutButton';
 
 export default function OnboardingPage() {
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    major: '',
-    interests: '',
-    goals: '',
-  });
-
-  const handleChange = (field: keyof typeof form, value: string) => {
-    setForm((current) => ({ ...current, [field]: value }));
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log('Onboarding submitted', form);
-  };
-
-  return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
-      <div className="mb-8 text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Student onboarding</p>
-        <h1 className="mt-3 text-4xl font-black text-slate-900">Tell us about your goals</h1>
-      </div>
-
-      <form onSubmit={handleSubmit} className="card rounded-3xl p-6 md:p-8">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">Full name</label>
-            <input value={form.name} onChange={(e) => handleChange('name', e.target.value)} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3" placeholder="Jane Doe" />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">Email</label>
-            <input value={form.email} onChange={(e) => handleChange('email', e.target.value)} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3" placeholder="jane@campus.edu" />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">Current major</label>
-            <input value={form.major} onChange={(e) => handleChange('major', e.target.value)} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3" placeholder="Computer Science" />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">Career interests</label>
-            <input value={form.interests} onChange={(e) => handleChange('interests', e.target.value)} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3" placeholder="AI, product, startup" />
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <label className="mb-2 block text-sm font-medium text-slate-700">Career goals</label>
-          <textarea value={form.goals} onChange={(e) => handleChange('goals', e.target.value)} rows={5} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3" placeholder="I want to build a sustainable career in data and digital products..." />
-        </div>
-
-        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-end">
-          <button type="button" className="rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700">Save draft</button>
-          <button type="submit" className="rounded-2xl bg-brand-600 px-5 py-3 font-semibold text-white transition hover:bg-brand-700">Complete onboarding</button>
-        </div>
-      </form>
-    </main>
-  );
+  const router = useRouter(); const [userId, setUserId] = useState(''); const [email, setEmail] = useState('');
+  const [form, setForm] = useState({ full_name: '', major: '', interests: '', career_goals: '' }); const [error, setError] = useState(''); const [saving, setSaving] = useState(false);
+  useEffect(() => { getCurrentUser().then((user) => { if (!user) router.replace('/login'); else { setUserId(user.id); setEmail(user.email ?? ''); } }); }, [router]);
+  function update(field: keyof typeof form, value: string) { setForm((current) => ({ ...current, [field]: value })); }
+  async function submit(event: React.FormEvent) { event.preventDefault(); setError(''); setSaving(true); const { error: saveError } = await upsertStudentProfile(userId, { ...form, email, interests: form.interests.split(',').map((item) => item.trim()) }); if (saveError) setError(saveError.message); else router.replace('/dashboard'); setSaving(false); }
+  return <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6"><div className="mx-auto max-w-3xl"><header className="mb-8 flex items-start justify-between gap-4"><div><p className="text-sm font-semibold uppercase tracking-widest text-brand-700">Student onboarding</p><h1 className="mt-2 text-3xl font-black text-slate-900 sm:text-4xl">Build your career profile</h1><p className="mt-2 text-slate-600">Your answers power better recommendations.</p></div><SignOutButton /></header><form onSubmit={submit} className="rounded-3xl bg-white p-6 shadow-soft sm:p-8">{error && <p role="alert" className="mb-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}<div className="grid gap-5 sm:grid-cols-2"><label className="text-sm font-semibold text-slate-700">Full name<input required value={form.full_name} onChange={(e) => update('full_name', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-brand-500" /></label><label className="text-sm font-semibold text-slate-700">Email<input disabled value={email} className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 font-normal text-slate-500" /></label><label className="text-sm font-semibold text-slate-700">Major or field of study<input required value={form.major} onChange={(e) => update('major', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-brand-500" /></label><label className="text-sm font-semibold text-slate-700">Career interests<input value={form.interests} onChange={(e) => update('interests', e.target.value)} placeholder="Design, data, product" className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-brand-500" /></label></div><label className="mt-5 block text-sm font-semibold text-slate-700">Career goals<textarea required rows={5} value={form.career_goals} onChange={(e) => update('career_goals', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-brand-500" /></label><button disabled={saving} className="mt-6 w-full rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white hover:bg-brand-700 disabled:opacity-50">{saving ? 'Saving profile…' : 'Save and view dashboard'}</button></form></div></main>;
 }

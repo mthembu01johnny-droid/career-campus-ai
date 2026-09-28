@@ -1,2 +1,25 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';\n\nexport const createSupabaseAuthClient = () => {\n  return createClientComponentClient();\n};\n\nexport async function signUp(email: string, password: string) {\n  const supabase = createSupabaseAuthClient();\n  return supabase.auth.signUp({ email, password });\n}\n\nexport async function signIn(email: string, password: string) {\n  const supabase = createSupabaseAuthClient();\n  return supabase.auth.signInWithPassword({ email, password });\n}\n\nexport async function signOut() {\n  const supabase = createSupabaseAuthClient();\n  return supabase.auth.signOut();\n}\n\nexport async function getSession() {\n  const supabase = createSupabaseAuthClient();\n  const { data } = await supabase.auth.getSession();\n  return data.session;\n}\n\nexport async function getCurrentUser() {\n  const supabase = createSupabaseAuthClient();\n  const { data } = await supabase.auth.getUser();\n  return data.user;\n}\n"
-</invoke>
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+export const createSupabaseAuthClient = () => createClientComponentClient();
+
+export async function signUp(email: string, password: string) {
+  const supabase = createSupabaseAuthClient();
+  return supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+  });
+}
+
+export async function signIn(email: string, password: string) {
+  return createSupabaseAuthClient().auth.signInWithPassword({ email, password });
+}
+
+export async function signOut() {
+  return createSupabaseAuthClient().auth.signOut();
+}
+
+export async function getCurrentUser() {
+  const { data } = await createSupabaseAuthClient().auth.getUser();
+  return data.user;
+}
