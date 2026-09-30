@@ -155,7 +155,7 @@ export default function HomePage() {
           <div className="grid gap-8 md:grid-cols-3">
             {testimonials.map((testimonial) => (
               <div key={testimonial.name} className="rounded-2xl bg-white p-8 shadow-soft">
-                <p className="text-slate-600">\"{testimonial.text}\"</p>
+                <p className="text-slate-600">&ldquo
                 <p className="mt-4 font-semibold text-slate-900">{testimonial.name}</p>
                 <p className="text-sm text-slate-500">{testimonial.role}</p>
               </div>
