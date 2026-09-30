@@ -39,7 +39,7 @@ export default function RecruiterOnboardingPage() {
         {success && (
           <div className="mt-6 rounded-2xl bg-emerald-50 p-6 text-emerald-700">
             <p className="font-semibold">Thank you for your interest!</p>
-            <p className="mt-2 text-sm">We'll review your application and be in touch within 24 hours.</p>
+            <p className="mt-2 text-sm">We&apos;ll review your application and be in touch within 24 hours.</p>
           </div>
         )}
 
