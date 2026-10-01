@@ -50,7 +50,7 @@ function extractSkillsFromText(text: string): string[] {
     }
   }
 
-  return [...new Set(extractedSkills)];
+  return Array.from(new Set(extractedSkills));
 }
 
 function calculateFitScore(studentSkills: string[], roleRequiredSkills: string[]): number {
