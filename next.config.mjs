@@ -2,10 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  images: { unoptimized: true },
-  eslint: {
-    ignoreDuringBuilds: true,
+  images: {
+    unoptimized: true
   },
+  eslint: {
+    ignoreDuringBuilds: true
+  }
 };
 
 export default nextConfig;
